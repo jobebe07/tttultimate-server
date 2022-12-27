@@ -1,0 +1,20 @@
+{
+  "name": "tttultimate-server",
+  "version": "1.0.0",
+  "description": "Game server for TicTacToe Ultimate",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jobebe07/tttultimate-server"
+  },
+  "author": "jobebe07",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "ws": "^8.11.0"
+  }
+}
