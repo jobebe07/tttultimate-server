@@ -3,3 +3,5 @@ const GameStatus = {
     INGAME: 1,
     END: 2,
 }
+
+export default GameStatus

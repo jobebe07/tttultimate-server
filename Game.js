@@ -1,5 +1,6 @@
 import Items from "./modules/Items.js";
 import ClientHandler from "./modules/ClientHandler.js";
+import GameStatus from "./modules/GameStatus.js";
 
 export default class Game {
     constructor(conIDX, conIDO) {

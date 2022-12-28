@@ -22,7 +22,7 @@ websocketServer.on("connection", function (websocket, request) {
         }
         if(data.type === ClientMessageType.MOVE) {
             let chords = data.content
-            ClientHandler.games[ClientHandler.playerGameID.get(id)].set(chords.row, chords.col, chords.fieldRow, chords.fieldCol)
+            ClientHandler.games.get(ClientHandler.playerGameID.get(id)).set(chords.row, chords.col, chords.fieldRow, chords.fieldCol)
         }
     })
 
