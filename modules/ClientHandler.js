@@ -6,7 +6,7 @@ export default class ClientHandler {
     // connectionID -> websocket
     static connections = new Map()
     // connectionIDs
-    static pendingPlayerIDs = []
+    static pendingPlayerIDs = new Map()
     // instances of 'Game'
     static games = []
     // connectionID -> index from current game in 'games'
@@ -14,23 +14,32 @@ export default class ClientHandler {
 
     static clientConnect(id, client) {
         this.connections.set(id, client)
-        this.pendingPlayerIDs.push(id)
+        this.pendingPlayerIDs.set(id, this.pendingPlayerIDs.length)
 
         this.createGames()
+
+        console.log("A client connected")
     }
 
     static clientDisconnect(id) {
         this.connections.delete(id)
+        this.pendingPlayerIDs.delete(id)
 
-        let gameID = this.playerGameID.get(id)
+        if(this.playerGameID.has(id)) {
+            let gameID = this.playerGameID.get(id)
 
-        this.disbandGame(gameID)
+            this.disbandGame(gameID)
+        }
+
+        console.log("A client disconnected")
     }
 
     static createGames() {
         while(this.pendingPlayerIDs.length >= 2) {
-            let idX = this.pendingPlayerIDs.pop()
-            let idO = this.pendingPlayerIDs.pop()
+            let idX = this.pendingPlayerIDs.get(this.pendingPlayerIDs.length-1)
+            let idO = this.pendingPlayerIDs.get(this.pendingPlayerIDs.length-1)
+            this.pendingPlayerIDs.delete(this.pendingPlayerIDs.length-1)
+            this.pendingPlayerIDs.delete(this.pendingPlayerIDs.length-1)
             this.games.push(new Game(idX, idO))
             this.playerGameID.set(idX, this.games.length-1)
             this.playerGameID.set(idO, this.games.length-1)
@@ -40,7 +49,7 @@ export default class ClientHandler {
     static sendStatus(clientID, status) {
         if(this.connections.has(clientID)) {
             let msg = new MessageBuilder(MessageType.STATUS_CHANGE, status).build()
-            this.connections.get(clientID).send(msg)
+            this.connections.get(clientID).send(JSON.stringify(msg))
         }
     }
 

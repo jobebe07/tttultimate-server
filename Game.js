@@ -1,5 +1,3 @@
-import MessageBuilder from "./modules/MessageBuilder.js";
-import MessageType from "./modules/MessageType.js";
 import Items from "./modules/Items.js";
 import ClientHandler from "./modules/ClientHandler.js";
 
@@ -27,11 +25,20 @@ export default class Game {
         }
     }
 
+    getField() {
+        return this.field
+    }
+
+    set(row, col, fieldRow, fieldCol) {
+
+    }
+
     getConnectionByID(id) {
-        if(Connections.map.has(id)) {
+        if(ClientHandler.connections.has(id)) {
             return ClientHandler.connections.get(id)
         } else {
-            this.gameState = GameStatus.DISCONNECT
+            this.disband()
+            return false
         }
     }
 
