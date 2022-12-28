@@ -4,6 +4,9 @@ import crypto from "crypto";
 import ClientMessageType from "./modules/ClientMessageType.js";
 import MessageBuilder from "./modules/MessageBuilder.js";
 import MessageType from "./modules/MessageType.js";
+import GameStatus from "./modules/GameStatus.js";
+import Logger from "./modules/Logger.js";
+import config from "./modules/config.js";
 
 let websocketServer = new WebSocket.WebSocketServer({port: 8080})
 
@@ -22,7 +25,17 @@ websocketServer.on("connection", function (websocket, request) {
         }
         if(data.type === ClientMessageType.MOVE) {
             let chords = data.content
-            ClientHandler.games.get(ClientHandler.playerGameID.get(id)).set(chords.row, chords.col, chords.fieldRow, chords.fieldCol)
+            if(config.verbose) {
+                Logger.log("Game [" + ClientHandler.playerGameID.get(id) + "] Received move from " + id + " with choords " + JSON.stringify(chords))
+            }
+            if(ClientHandler.isIngame(id)) {
+                let game = ClientHandler.games.get(ClientHandler.playerGameID.get(id))
+                game.set(chords.row, chords.col, chords.fieldRow, chords.fieldCol, id)
+            }
+        }
+        if(data.type === ClientMessageType.JOIN) {
+            ClientHandler.sendStatus(id, GameStatus.WAITING)
+            ClientHandler.addToQueue(id)
         }
     })
 

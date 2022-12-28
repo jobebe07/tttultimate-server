@@ -14,16 +14,17 @@ export default class ClientHandler {
     static games = new Map()
     // connectionID -> index from current game in 'games'
     static playerGameID = new Map()
+    static inactive = new Map()
 
     static clientConnect(id, client) {
         this.connections.set(id, client)
-        this.pendingPlayerIDs.set(id, this.pendingPlayerIDs.size)
+        //this.addToQueue(id)
 
         if(config.verbose) {
             Logger.log(`Client (ID: ${id}) connected --- PENDING: ${this.pendingPlayerIDs.size}`)
         }
 
-        this.createGames()
+        this.sendStatus(id, GameStatus.INACTIVE)
     }
 
     static clientDisconnect(id) {
@@ -61,28 +62,47 @@ export default class ClientHandler {
         }
     }
 
-    static sendStatus(clientID, status) {
+    static sendStatus(clientID, status, content = null) {
         if(this.connections.has(clientID)) {
-            let msg = new MessageBuilder(MessageType.STATUS_CHANGE, status).build()
+            let msg = {}
+            if(content == null) {
+                msg = new MessageBuilder(MessageType.STATUS_CHANGE, {status:status}).build()
+            } else {
+                msg = new MessageBuilder(MessageType.STATUS_CHANGE, {status:status, data:content}).build()
+            }
             this.connections.get(clientID).send(JSON.stringify(msg))
+
         }
+    }
+
+    static addToQueue(id) {
+        if(this.isIngame(id)) return
+
+        if(this.inactive.has(id)) {
+            this.inactive.delete(id)
+        }
+        this.pendingPlayerIDs.set(id, this.pendingPlayerIDs.size)
+
+        this.createGames()
     }
 
     static disbandGame(gameID) {
         let conIDX = this.games.get(gameID).conIDX
         let conIDO = this.games.get(gameID).conIDO
 
-        this.sendStatus(conIDX, GameStatus.WAITING)
-        this.sendStatus(conIDO, GameStatus.WAITING)
+        this.sendStatus(conIDX, GameStatus.END)
+        this.sendStatus(conIDO, GameStatus.END)
 
         this.playerGameID.delete(conIDX)
         this.playerGameID.delete(conIDO)
 
         if(this.connections.has(conIDX)) {
-            this.pendingPlayerIDs.set(conIDX, this.pendingPlayerIDs.size)
+            //this.pendingPlayerIDs.set(conIDX, this.pendingPlayerIDs.size)
+            this.inactive.set(conIDX, this.inactive.size)
         }
         if(this.connections.has(conIDO)) {
-            this.pendingPlayerIDs.set(conIDO, this.pendingPlayerIDs.size)
+            //this.pendingPlayerIDs.set(conIDO, this.pendingPlayerIDs.size)
+            this.inactive.set(conIDO, this.inactive.size)
         }
 
         this.games.delete(gameID)
