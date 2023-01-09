@@ -1,10 +1,9 @@
+import MonteCarlo from "./modules/mcts/MonteCarlo"
 import MonteCarloField from "./modules/mcts/MonteCarloField"
 
 export default class MonteCarloGame {
     constructor() {
-        const Game = new MonteCarloField()
-        const MonteCarlo = new MonteCarlo()
-        let game = new Game()
+        let game = new MonteCarloField()
         let mcts = new MonteCarlo(game)
         let state = game.start()
         let winner = game.winner(state)// From initial state, take turns to play game until someone wins
