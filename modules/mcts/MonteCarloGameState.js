@@ -1,8 +1,10 @@
 export default class MonteCarloGameState {
-    constructor(playHistory, board, player) {
+    constructor(playHistory, board, locked, next, player) {
         this.playHistory = playHistory
         this.board = board
+        this.locked = locked
         this.player = player
+        this.next = next
     }
 
     isPlayer(player) {
