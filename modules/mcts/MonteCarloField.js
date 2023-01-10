@@ -1,6 +1,6 @@
-import MonteCarloGameState from "./MonteCarloGameState"
-import MonteCarloPlay from "./MonteCarloPlay"
-import Player from "./MonteCarloPlayer"
+import MonteCarloGameState from "./MonteCarloGameState.js"
+import MonteCarloPlay from "./MonteCarloPlay.js"
+import Player from "./MonteCarloPlayer.js"
 
 export default class MonteCarloField {
     constructor() {
@@ -20,7 +20,7 @@ export default class MonteCarloField {
 
         for(let row = 0; row <= 2; row++) {
             this.boardPrototype[row] = []
-            for (let row = 0; row <= 2; row++) {
+            for (let col = 0; col <= 2; col++) {
                 this.boardPrototype[row][col] = []
                 for(let fieldRow = 0; fieldRow <= 2; fieldRow++) {
                     this.boardPrototype[row][col][fieldRow] = []
@@ -33,7 +33,7 @@ export default class MonteCarloField {
 
         for(let row = 0; row <= 2; row++) {
             this.lockedPrototype[row] = []
-            for (let row = 0; row <= 2; row++) {
+            for (let col = 0; col <= 2; col++) {
                 this.lockedPrototype[row][col] = {locked: false, lockItem: Player.DEFAULT}
             }
         }
@@ -104,7 +104,7 @@ export default class MonteCarloField {
                 array[row][col] = state.locked[row][col].lockItem
             }
         }
-        return this.checkField(array, Items.DEFAULT)
+        return this.checkField(array, Player.DEFAULT)
     }
 
 

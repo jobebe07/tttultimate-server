@@ -38,14 +38,15 @@ export default class MonteCarlo {
         for (let play of allPlays) {
             let childNode = node.childNode(play)
             if (childNode.n_plays > max) {
-            bestPlay = play
-            max = childNode.n_plays
+                bestPlay = play
+                max = childNode.n_plays
             }
         }
         return bestPlay
     }  /** Phase 1, Selection: Select until not fully expanded OR leaf */
     /** Phase 1, Selection: Select until not fully expanded OR leaf */
-    select(state) {    let node = this.nodes.get(state.hash())
+    select(state) {
+        let node = this.nodes.get(state.hash())
         while(node.isFullyExpanded() && !node.isLeaf()) {
             let plays = node.allPlays()
             let bestPlay
@@ -73,7 +74,8 @@ export default class MonteCarlo {
         return childNode
     }  /** Phase 3, Simulation: Play game to terminal state, return winner */
     /** Phase 3, Simulation: Play game to terminal state, return winner */
-    simulate(node) {    let state = node.state
+    simulate(node) {
+        let state = node.state
         let winner = this.game.winner(state)
         while (winner === null) {
             let plays = this.game.legalPlays(state)
