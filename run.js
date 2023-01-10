@@ -10,24 +10,20 @@ let winner = game.winner(state)// From initial state, take turns to play game un
 
 // From initial state, play games until end
 
-while (winner === null) {
+while (!winner) {
 
-    console.log()
-    console.log("player: " + (state.player === 1 ? 1 : 2))
-    console.log(state.board.map((row) => row.map((cell) => cell === -1 ? 2 : cell)))
+    console.log("player: " + state.player)
 
-    mcts.runSearch(state, 1)
+    mcts.runSearch(state, 300)
 
     let stats = mcts.getStats(state)
-    console.log(util.inspect(stats, {showHidden: false, depth: null}))
+    console.log(stats)
 
     let play = mcts.bestPlay(state, "robust")
-    console.log("chosen play: " + util.inspect(play, {showHidden: false, depth: null}))
-
+    console.log("chosen play: " + play)
     state = game.nextState(state, play)
     winner = game.winner(state)
 }
 
-console.log()
-console.log("winner: " + (winner === 1 ? 1 : 2))
-console.log(state.board, state.locked)
+console.log("winner: " + winner)
+console.log(game.getFieldVisual(state))

@@ -1,17 +1,27 @@
-export default class MonteCarloNode {
+'use strict'
+
+/**
+ * Class representing a node in the search tree.
+ * Stores tree search stats for UCB1.
+ */
+class MonteCarloNode {
     /**
-   * Create a new MonteCarloNode in the search tree.
-   * @param {MonteCarloNode} parent - The parent node.
-   * @param {Play} play - Last play played to get to this state.
-   * @param {State} state - The corresponding state.
-   * @param {Play[]} unexpandedPlays - The node's unexpanded child plays.
-   */
+     * Create a new MonteCarloNode in the search tree.
+     * @param {MonteCarloNode} parent - The parent node.
+     * @param {MonteCarloPlay} play - Last play played to get to this state.
+     * @param {MonteCarloGameState} state - The corresponding state.
+     * @param {MonteCarloPlay[]} unexpandedPlays - The node's unexpanded child plays.
+     */
     constructor(parent, play, state, unexpandedPlays) {
 
         this.play = play
-        this.state = state    // Monte Carlo stuff
+        this.state = state
+
+        // Monte Carlo stuff
         this.n_plays = 0
-        this.n_wins = 0    // Tree stuff
+        this.n_wins = 0
+
+        // Tree stuff
         this.parent = parent
         this.children = new Map()
         for (let play of unexpandedPlays) {
@@ -19,36 +29,90 @@ export default class MonteCarloNode {
         }
     }
 
-    /** Get the MonteCarloNode corresponding to the given play. */
+    /**
+     * Get the MonteCarloNode corresponding to the given play.
+     * @param {MonteCarloPlay} play - The play leading to the child node.
+     * @return {MonteCarloNode} The child node corresponding to the play given.
+     */
     childNode(play) {
-        // TODO
-        // return MonteCarloNode
-    }  /** Expand the specified child play and return the new child node. */
+        let child = this.children.get(play.hash())
+        if (child === undefined) {
+            throw new Error('No such play!')
+        }
+        else if (child.node === null) {
+            throw new Error("Child is not expanded!")
+        }
+        return child.node
+    }
+
+    /**
+     * Expand the specified child play and return the new child node.
+     * Add the node to the array of children nodes.
+     * Remove the play from the array of unexpanded plays.
+     * @param {MonteCarloPlay} play - The play to expand.
+     * @param {MonteCarloGameState} childState - The child state corresponding to the given play.
+     * @param {MonteCarloPlay[]} unexpandedPlays - The given child's unexpanded child plays; typically all of them.
+     * @return {MonteCarloNode} The new child node.
+     */
     expand(play, childState, unexpandedPlays) {
-        // TODO
-        // return MonteCarloNode
-    }  /** Get all legal plays from this node. */
+        if (!this.children.has(play.hash())) throw new Error("No such play!")
+        let childNode = new MonteCarloNode(this, play, childState, unexpandedPlays)
+        this.children.set(play.hash(), { play: play, node: childNode })
+        return childNode
+    }
+
+    /**
+     * Get all legal plays from this node.
+     * @return {MonteCarloPlay[]} All plays.
+     */
     allPlays() {
-        // TODO
-        // return Play[]
-    }  /** Get all unexpanded legal plays from this node. */
+        let ret = []
+        for (let child of this.children.values()) {
+            ret.push(child.play)
+        }
+        return ret
+    }
+
+    /**
+     * Get all unexpanded legal plays from this node.
+     * @return {MonteCarloPlay[]} All unexpanded plays.
+     */
     unexpandedPlays() {
-        // TODO
-        // return Play[]
-    }  /** Whether this node is fully expanded. */
+        let ret = []
+        for (let child of this.children.values()) {
+            if (child.node === null) ret.push(child.play)
+        }
+        return ret
+    }
+
+    /**
+     * Whether this node is fully expanded.
+     * @return {boolean} Whether this node is fully expanded.
+     */
     isFullyExpanded() {
-        // TODO
-        // return bool
-    }  /** Whether this node is terminal in the game tree, 
-        NOT INCLUSIVE of termination due to winning. */
+        for (let child of this.children.values()) {
+            if (child.node === null) return false
+        }
+        return true
+    }
+
+    /**
+     * Whether this node is terminal in the game tree, NOT INCLUSIVE of termination due to winning.
+     * @return {boolean} Whether this node is a leaf in the tree.
+     */
     isLeaf() {
-        // TODO
-        // return bool
+        return this.children.size === 0;
     }
-    
-    /** Get the UCB1 value for this node. */
+
+    /**
+     * Get the UCB1 value for this node.
+     * @param {number} biasParam - The square of the bias parameter in the UCB1 algorithm, defaults to 2.
+     * @return {number} The UCB1 value of this node.
+     */
     getUCB1(biasParam) {
-        // TODO
-        // return number
+        return (this.n_wins / this.n_plays) + Math.sqrt(biasParam * Math.log(this.parent.n_plays) / this.n_plays);
     }
+
 }
+
+export default MonteCarloNode

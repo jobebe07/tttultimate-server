@@ -12,9 +12,8 @@ export default class MonteCarloGame {
 
         // From initial state, play games until end
 
-        while (winner === null) {
+        while (winner === false) {
 
-            console.log()
             console.log("player: " + (state.player === 1 ? 1 : 2))
             console.log(state.board.map((row) => row.map((cell) => cell === -1 ? 2 : cell)))
 
